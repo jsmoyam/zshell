@@ -4,7 +4,6 @@ import os
 import platform
 import subprocess
 import inspect
-import pyfiglet
 import getpass
 import socket
 import time
@@ -13,7 +12,6 @@ import tarfile
 import pathlib
 from colorama import Fore, Style
 from cmd2 import bg, fg, style
-
 
 class MyShell(cmd2.Cmd):
     version_name = '1.0'
@@ -40,7 +38,7 @@ class MyShell(cmd2.Cmd):
 
         # Set prompt and intro
         self._set_prompt()
-        self.intro = pyfiglet.figlet_format('zShell') + self.version_name
+        self.intro = 'zShell ' + self.version_name
 
         # Set some properties
         self.hidden_commands.append('py')

@@ -55,7 +55,7 @@ class MyShell(cmd2.Cmd):
     def _set_prompt(self):
         """Set prompt so it displays the current working directory."""
         self.cwd = os.getcwd()
-        homedir = os.environ['HOME']
+        homedir = os.path.expanduser('~')
 
         if self.cwd.startswith(homedir):
             self.cwd = '~' + self.cwd[len(homedir):]

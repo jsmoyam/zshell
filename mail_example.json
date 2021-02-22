@@ -1,0 +1,12 @@
+{
+  "sendingNumber": 2,
+  "secondsBetweenSending": 5,
+  "from": "opplus.tecnologia@gmail.com",
+  "password": "opplus20/*",
+  "to": ["jsmoyam@gmail.com"],
+  "cc": [],
+  "bcc": [],
+  "subject": "Envio de prueba {DATETIME}",
+  "body": "<h3>Envio de prueba</h3><p><h4>{DATETIME}</h4>",
+  "attachments": ["document.pdf", "document1.pdf"]
+}

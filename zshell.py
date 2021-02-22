@@ -1,3 +1,5 @@
+import json
+
 import cmd2
 import sys
 import os
@@ -10,6 +12,8 @@ import time
 import datetime
 import tarfile
 import pathlib
+
+import yagmail
 from colorama import Fore, Style
 from cmd2 import bg, fg, style
 
@@ -317,6 +321,51 @@ class MyShell(cmd2.Cmd):
             f.writelines(lines_with_new_set)
 
         return
+
+    @cmd2.with_category(CUSTOM_CATEGORY)
+    def do_sendgmail(self, args):
+        """
+        Send mail through gmail
+        :param args: json file with mail data
+        :return:
+        """
+
+        arglist = args.split()
+
+        # Expect 1 argument
+        if not arglist or len(arglist) != 1:
+            self.perror('sendmail requires one argument')
+            self.do_help('sendmail')
+            self._last_result = cmd2.CommandResult('', 'Bad arguments')
+            return
+
+        # Recover arguments
+        file = arglist[0]
+
+        with open(file) as f:
+            data = json.load(f)
+
+        # Connecto to gmail
+        yag = yagmail.SMTP(user=data.get('from'), password=data.get('password'))
+
+        # Send mails
+        for i in range(data.get('sendingNumber')):
+            # Replace vars
+            subject = data.get('subject')
+            body = data.get('body')
+            var_datetime = dt_string = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            subject = subject.replace('{DATETIME}', var_datetime)
+            body = body.replace('{DATETIME}', var_datetime)
+
+            yag.send(to=data.get('to'),
+                     cc=data.get('cc'),
+                     bcc=data.get('bcc'),
+                     subject=subject,
+                     contents=body,
+                     attachments=data.get('attachments'),
+                     )
+            self.poutput('Mail {} sent'.format(i+1))
+            time.sleep(data.get('secondsBetweenSending'))
 
     def execute_generic_shell_command(self, *args):
         system = platform.system()

@@ -1,3 +1,5 @@
+import codecs
+import csv
 import json
 
 import cmd2
@@ -13,6 +15,7 @@ import datetime
 import tarfile
 import pathlib
 
+import requests
 import yagmail
 from colorama import Fore, Style
 from cmd2 import bg, fg, style
@@ -391,6 +394,45 @@ class MyShell(cmd2.Cmd):
         with open(self.STARTUP_SCRIPT, 'r') as f:
             lines = f.readlines()
         return lines
+
+    @cmd2.with_category(CUSTOM_CATEGORY)
+    def do_sendget(self, args):
+        """
+        Send get request
+        Usage:
+        sendget url csv_file
+        """
+
+        arglist = args.split()
+
+        # Expect 2 argument
+        if len(arglist) != 2:
+            self.perror('sendget requires exactly 2 argument')
+            self.do_help('sendget')
+            self._last_result = cmd2.CommandResult('', 'Bad arguments')
+            return
+
+        # Recover arguments
+        url = arglist[0]
+        file = arglist[1]
+
+        with codecs.open(file, 'rU', 'utf-16') as f:
+            csv_reader = csv.reader(f, delimiter=',')
+
+            # File number
+            file_number = 0
+            for row in csv_reader:
+                # Replace url with data from csv
+                i = 0
+                url_transformed = url
+                for data in row:
+                    url_transformed = url_transformed.replace('${}'.format(i), data)
+                    i = i + 1
+
+                # Send get request
+                r = requests.get(url_transformed)
+                self.poutput('GET request {} {} sent with output {} {}'.format(file_number, url_transformed, r.status_code, r.text))
+                file_number = file_number + 1
 
 if __name__ == '__main__':
     shell = MyShell()
